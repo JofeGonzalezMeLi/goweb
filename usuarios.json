@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "nombre": "Jose",
+        "apellido" : "Gonzalez",
+        "email" : "jg@meli.com",
+        "edad" : 22,
+        "altura": 175,
+        "activo" : true,
+        "fecha_creacion": "06/07/2022" 
+    },
+    {
+        "id": 1,
+        "nombre": "Domingo",
+        "apellido" : "Croce",
+        "email" : "dc@meli.com",
+        "edad" : 55,
+        "altura": 170,
+        "activo" : false,
+        "fecha_creacion": "16/03/2022" 
+    }
+]
