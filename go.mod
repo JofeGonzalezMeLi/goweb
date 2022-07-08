@@ -1,4 +1,4 @@
-module github.com/JofeGonzalezMeLi/goweb
+module github.com/JofeGonzalezMeLi/goweb/cmd
 
 go 1.18
 
