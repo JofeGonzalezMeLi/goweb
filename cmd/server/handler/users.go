@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/JofeGonzalezMeLi/goweb/cmd/internal/users"
@@ -31,7 +32,7 @@ func NewUser(u users.Service) *User {
 func (u *User) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("token")
-		if token != "123456" {
+		if token != os.Getenv("TOKEN") {
 			ctx.JSON(401, gin.H{
 				"error": "no tiene permisos para realizar la petición solicitada",
 			})
@@ -54,7 +55,7 @@ func (u *User) GetAll() gin.HandlerFunc {
 func (u *User) Store() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("token")
-		if token != "123456" {
+		if token != os.Getenv("TOKEN") {
 			ctx.JSON(401, gin.H{
 				"error": "no tiene permisos para realizar la petición solicitada",
 			})
@@ -82,7 +83,7 @@ func (u *User) Store() gin.HandlerFunc {
 func (u *User) Update() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("token")
-		if token != "123456" {
+		if token != os.Getenv("TOKEN") {
 			ctx.JSON(401, gin.H{
 				"error": "no tiene permisos para realizar la petición solicitada",
 			})
@@ -143,7 +144,7 @@ func (u *User) Update() gin.HandlerFunc {
 func (u *User) Delete() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("token")
-		if token != "123456" {
+		if token != os.Getenv("TOKEN") {
 			ctx.JSON(401, gin.H{
 				"error": "no tiene permisos para realizar la petición solicitada",
 			})
@@ -169,7 +170,7 @@ func (u *User) Delete() gin.HandlerFunc {
 func (u *User) UpdateLastNameAndAge() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("token")
-		if token != "123456" {
+		if token != os.Getenv("TOKEN") {
 			ctx.JSON(401, gin.H{
 				"error": "no tiene permisos para realizar la petición solicitada",
 			})

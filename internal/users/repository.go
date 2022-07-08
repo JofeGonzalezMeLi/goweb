@@ -10,12 +10,10 @@ import (
 )
 
 var users []domain.User
-var lastId int
 
 type Repository interface {
 	GetAll() ([]domain.User, error)
 	Store(id, edad int, nombre, apellido, email, fecha_creacion string, altura float64, activo bool) (domain.User, error)
-	LastId() (int, error)
 	Update(id, edad int, nombre, apellido, email, fecha_creacion string, altura float64, activo bool) (domain.User, error)
 	Delete(id int) error
 	UpdateLastNameAndAge(id, edad int, apellido string) (domain.User, error)
@@ -36,14 +34,9 @@ func (r *repository) GetAll() ([]domain.User, error) {
 	return users, nil
 }
 
-func (r *repository) LastId() (int, error) {
-	return lastId, nil
-}
-
 func (r *repository) Store(id, edad int, nombre, apellido, email, fecha_creacion string, altura float64, activo bool) (domain.User, error) {
 	u := domain.User{Id: id, Edad: edad, Nombre: nombre, Apellido: apellido, Email: email, Fecha_creacion: fecha_creacion, Altura: altura, Activo: activo}
 	users = append(users, u)
-	lastId = u.Id
 	return u, nil
 }
 

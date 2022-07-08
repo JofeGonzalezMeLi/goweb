@@ -31,14 +31,7 @@ func (s *service) GetAll() ([]domain.User, error) {
 }
 
 func (s *service) Store(edad int, nombre, apellido, email, fecha_creacion string, altura float64, activo bool) (domain.User, error) {
-	lastId, err := s.repository.LastId()
-	if err != nil {
-		return domain.User{}, err
-	}
-
-	lastId++
-
-	user, err := s.repository.Store(lastId, edad, nombre, apellido, email, fecha_creacion, altura, activo)
+	user, err := s.repository.Store(users[len(users)-1].Id+1, edad, nombre, apellido, email, fecha_creacion, altura, activo)
 	if err != nil {
 		return domain.User{}, err
 	}
