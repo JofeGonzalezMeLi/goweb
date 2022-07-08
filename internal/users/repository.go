@@ -1,47 +1,54 @@
 package users
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/JofeGonzalezMeLi/goweb/cmd/internal/domain"
+	"github.com/JofeGonzalezMeLi/goweb/cmd/pkg/store"
 )
 
 var users []domain.User
 
 type Repository interface {
 	GetAll() ([]domain.User, error)
-	Store(id, edad int, nombre, apellido, email, fecha_creacion string, altura float64, activo bool) (domain.User, error)
+	Store(edad int, nombre, apellido, email, fecha_creacion string, altura float64, activo bool) (domain.User, error)
 	Update(id, edad int, nombre, apellido, email, fecha_creacion string, altura float64, activo bool) (domain.User, error)
 	Delete(id int) error
 	UpdateLastNameAndAge(id, edad int, apellido string) (domain.User, error)
 }
 
-type repository struct{}
+type repository struct {
+	db store.Store
+}
 
-func NewRepository() Repository {
-	j, _ := os.ReadFile("./usuarios.json")
-	if err := json.Unmarshal(j, &users); err != nil {
-		log.Println(string(j))
-		log.Fatal(err)
+func NewRepository(db store.Store) Repository {
+	return &repository{
+		db: db,
 	}
-	return &repository{}
 }
 
 func (r *repository) GetAll() ([]domain.User, error) {
+	var users []domain.User
+	r.db.Read(&users)
 	return users, nil
 }
 
-func (r *repository) Store(id, edad int, nombre, apellido, email, fecha_creacion string, altura float64, activo bool) (domain.User, error) {
-	u := domain.User{Id: id, Edad: edad, Nombre: nombre, Apellido: apellido, Email: email, Fecha_creacion: fecha_creacion, Altura: altura, Activo: activo}
+func (r *repository) Store(edad int, nombre, apellido, email, fecha_creacion string, altura float64, activo bool) (domain.User, error) {
+	var users []domain.User
+	r.db.Read(&users)
+	u := domain.User{Id: users[len(users)-1].Id + 1, Edad: edad, Nombre: nombre, Apellido: apellido, Email: email, Fecha_creacion: fecha_creacion, Altura: altura, Activo: activo}
 	users = append(users, u)
+	if err := r.db.Write(users); err != nil {
+		return domain.User{}, nil
+	}
 	return u, nil
 }
 
 func (r *repository) Update(id, edad int, nombre, apellido, email, fecha_creacion string, altura float64, activo bool) (domain.User, error) {
 	u := domain.User{Id: id, Edad: edad, Nombre: nombre, Apellido: apellido, Email: email, Fecha_creacion: fecha_creacion, Altura: altura, Activo: activo}
+
+	var users []domain.User
+	r.db.Read(&users)
 
 	update := false
 
@@ -52,6 +59,10 @@ func (r *repository) Update(id, edad int, nombre, apellido, email, fecha_creacio
 			update = true
 		}
 	}
+	if err := r.db.Write(users); err != nil {
+		return domain.User{}, nil
+	}
+
 	if !update {
 		return domain.User{}, fmt.Errorf("Usuario %v no encontrado", id)
 	}
@@ -61,6 +72,8 @@ func (r *repository) Update(id, edad int, nombre, apellido, email, fecha_creacio
 func (r *repository) Delete(id int) error {
 	delete := false
 	var index int
+	var users []domain.User
+	r.db.Read(&users)
 	for i := range users {
 		if users[i].Id == id {
 			index = i
@@ -71,12 +84,17 @@ func (r *repository) Delete(id int) error {
 		return fmt.Errorf("Usuario %v no encontrado", id)
 	}
 	users = append(users[:index], users[index+1:]...)
+	if err := r.db.Write(users); err != nil {
+		return nil
+	}
 	return nil
 }
 
 func (r *repository) UpdateLastNameAndAge(id, edad int, apellido string) (domain.User, error) {
 	update := false
 	var u domain.User
+	var users []domain.User
+	r.db.Read(&users)
 	for i := range users {
 		if users[i].Id == id {
 			users[i].Apellido = apellido
@@ -87,6 +105,9 @@ func (r *repository) UpdateLastNameAndAge(id, edad int, apellido string) (domain
 	}
 	if !update {
 		return domain.User{}, fmt.Errorf("Usuario %v no encontrado", id)
+	}
+	if err := r.db.Write(users); err != nil {
+		return domain.User{}, nil
 	}
 	return u, nil
 }
